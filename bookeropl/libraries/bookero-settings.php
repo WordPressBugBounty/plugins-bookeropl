@@ -113,10 +113,14 @@ class BookeroSettingsPage
     public function print_section_info()
     {
         echo '<strong>Wypełnij poniższe parametry:</strong> <br /><i>Jeśli chcesz pokazać formularz rezerwacji bezpośrednio w treści, wybierz rodzaj formularza Box, a następnie skorzystaj z shortcode <strong>[bookero_form]</strong> w wybranym miejscu.</i><br />';
-        echo '<br /><strong>[WSKAZÓWKI]</strong> <i>Jeśli chcesz wymusić wyświetlenie konkretnej usługi lub kategorii wykorzystaj parametry dla shortcode:</i>';
+        echo '<i>Jeśli chcesz pokazać formularz zamawiania produktów w treści, skorzystaj z shortcode <strong>[bookero_products]</strong> w wybranym miejscu.</i><br />';
+        echo '<br /><strong>[WSKAZÓWKI DOT. FORMULARZA REZERWACJI]</strong> <i>Jeśli chcesz wymusić wyświetlenie konkretnej usługi lub kategorii wykorzystaj poniższe parametry dla shortcode:</i>';
         echo '<br /><i> - Jeśli chcesz wymusić wybór kategorii skorzystaj z shortcode <strong>[bookero_form category=ID_KATEGORII]</strong></i><br /><i> - Jeśli chcesz wymusić wybór usługi skorzystaj z shortcode <strong>[bookero_form service=ID_USLUGI]</strong></i>';
         echo '<br /><i> - Jeśli chcesz domyślnie zaznaczyć kategorię skorzystaj z shortcode <strong>[bookero_form select_category=ID_KATEGORII]</strong></i><br /><i> - Jeśli chcesz domyślnie zaznaczyć usługę skorzystaj z shortcode <strong>[bookero_form select_service=ID_USLUGI]</strong></i>';
         echo '<br /><i> - Jeśli chcesz wymusić wybór pracownika skorzystaj z shortcode <strong>[bookero_form worker_id=ID_PRACOWNIKA]</strong></i><br /><i> - Jeśli chcesz dodatkowo ukryć informacje o wymuszonym pracowniku, skorzystaj z shortcode <strong>[bookero_form worker_id=ID_PRACOWNIKA hide_worker=1]</strong></i>';
+        echo '<br /><br /><strong>[WSKAZÓWKI DOT. FORMULARZA PRODUKTÓW]</strong> <i>Jeśli chcesz wymusić wyświetlenie konkretnych produktów wykorzystaj poniższe parametry dla shortcode:</i>';
+        echo '<br /><i> - Jeśli chcesz wymusić wybór konkretnego produktu skorzystaj z shortcode <strong>[bookero_products product=ID_PRODUKTU]</strong></i><br /><i> - Jeśli chcesz pokazać konkretne produkty skorzystaj z shortcode <strong>[bookero_products filter_products=ID_PRODUKTOW_PO_PRZECINKU]</strong></i>';
+        echo '<br /><i> - Jeśli chcesz ukryć konkretne produkty skorzystaj z shortcode <strong>[bookero_products hide_products=ID_PRODUKTOW_PO_PRZECINKU]</strong></i>';
     }
 
     /**

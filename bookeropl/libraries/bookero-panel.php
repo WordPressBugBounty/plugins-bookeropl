@@ -22,7 +22,7 @@ class BookeroPanelPage
     public function add_plugin_page()
     {
         $this->options = get_option( 'bookero_options' );
-        add_menu_page( 'Bookero', 'Rezerwacje', 'manage_options', 'bookero-panel', array($this, 'bookero_dashboard'), plugins_url('images/bookero-logo.png', getPluginDir().'images/'),'2.0.0');
+        add_menu_page( 'Bookero', 'Rezerwacje', 'manage_options', 'bookero-panel', array($this, 'bookero_dashboard'), plugins_url('images/bookero-logo.png', getPluginDir().'images/'),'2');
         add_submenu_page( 'bookero-panel', 'Bookero - Kalendarz', 'Kalendarz', 'manage_options', 'bookero-panel', array($this, 'bookero_dashboard'));
         add_submenu_page( 'bookero-panel', 'Bookero - Ustawienia', 'Ustawienia', 'manage_options', 'bookero-settings', array($this->pages['settings'], 'create_admin_page'));
         add_submenu_page( 'bookero-panel', 'Bookero - Pomoc', 'Pomoc', 'manage_options', 'bookero-help', array($this, 'bookero_help'));

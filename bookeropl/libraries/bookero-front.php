@@ -13,6 +13,7 @@ class BookeroFrontPage
     {
         add_action( 'wp_footer', array( $this, 'show_plugin' ) );
         add_shortcode( 'bookero_form', array( $this, 'bookero_form' ) );
+        add_shortcode( 'bookero_products', array( $this, 'bookero_products' ) );
     }
 
     /**
@@ -20,6 +21,29 @@ class BookeroFrontPage
      */
     public function show_plugin()
     {
+        $this->options = get_option( 'bookero_options' );
+
+        $plugin_id = false;
+        if (!empty($this->options['bookero_api_key'])){
+            $plugin_id = Bookero::checkApiKey($this->options['bookero_api_key']);
+        }
+
+        if($this->options['show_plugin'] == 1 && $plugin_id !== false) {
+            list($plugin_id, $container, $plugin_type, $plugin_css, $lang) = $this->get_instance_object();
+            if($plugin_type == 'sticky'){
+                echo $this->bookero_form([], true);
+            }
+            $plugin_html = $this->getPlugin();
+            echo $plugin_html;
+        }
+    }
+
+    /**
+     * Get instance of Bookero config
+     *
+     * @return array
+     */
+    private function get_instance_object(){
         $this->options = get_option( 'bookero_options' );
 
         $plugin_id = false;
@@ -41,11 +65,10 @@ class BookeroFrontPage
             if ($this->options['plugin_type'] == 1) {
                 $container = '';
                 $plugin_type = 'sticky';
-            }
-            elseif ($this->options['plugin_type'] == 3) {
+            } elseif ($this->options['plugin_type'] == 3) {
                 $container = $this->options['plugin_html_id'];
                 $plugin_type = 'full';
-            }elseif ($this->options['plugin_type'] == 4) {
+            } elseif ($this->options['plugin_type'] == 4) {
                 $container = $this->options['plugin_html_id'];
                 $plugin_type = 'calendar';
             } else {
@@ -55,26 +78,31 @@ class BookeroFrontPage
 
             $plugin_css = $this->options['plugin_css'] == 1 ? 'true' : 'false';
 
-            $lang = 'pl';
             $wp_lang = get_locale(); // ZWRACA KOD JEZYKA NP pl_PL
             $wp_lang = explode('_', $wp_lang);
             $lang = strtolower($wp_lang[0]);
-            if(!in_array($lang, array('pl', 'en', 'ru', 'de', 'it'))){
+            if (!in_array($lang, array('pl', 'en', 'ru', 'de', 'it', 'cs'))) {
                 $lang = 'pl';
             }
+            if ($lang == 'cs') {
+                $lang = 'cz';
+            }
 
-            $plugin_html = $this->getPlugin($plugin_id, $container, $plugin_type, $plugin_css, $lang);
-
-            echo $plugin_html;
+            return [
+                $plugin_id, $container, $plugin_type, $plugin_css, $lang
+            ];
         }
+        return [
+            null, null, null, null, null
+        ];
     }
 
     /**
-     * Shortcode for bookero form DIV
+     * Shortcode to show Bookero booking form
      *
      * @return string
      */
-    public static function bookero_form($atts){
+    public function bookero_form($atts, $force_sticky = false){
         $atts = array_change_key_case((array)$atts, CASE_LOWER);
         $params = array();
         if(isset($atts['service']) && !isset($atts['select_service'])){
@@ -101,36 +129,98 @@ class BookeroFrontPage
             $custom_config = '{'.implode(', ', $params).'}';
         }
 
-        return '<script type="text/javascript">var bookero_custom_config = '.$custom_config.';</script><div id="bookero"></div>';
+        list($plugin_id, $container, $plugin_type, $plugin_css, $lang) = $this->get_instance_object();
+
+        if($container){
+            $container = 'bookero_'.uniqid();
+        }
+        $html = '';
+        if($plugin_type != 'sticky' || $force_sticky == true){
+            $html = "<script type=\"text/javascript\">
+if(bookero_config == undefined){
+    var bookero_config = [];
+}
+var bookero_instance_config = {
+    id: '" . $plugin_id . "',
+    container: '" . $container . "',
+    type: '" . $plugin_type . "',
+    position: '',
+    plugin_css: " . $plugin_css . ",
+    lang: '" . $lang . "',
+    custom_config: ".$custom_config."
+};
+bookero_config.push(bookero_instance_config);
+</script>";
+        }
+        if($container){
+            $html .= "<div id=\"".$container."\"></div>";
+        }
+
+        return $html;
     }
 
     /**
-     * Get new version of plugin
-     *
-     * @param $plugin_id
-     * @param $container
-     * @param $plugin_type
-     * @param $plugin_css
+     * Shortcode to show Bookero products form
      *
      * @return string
      */
-    public function getPlugin($plugin_id, $container, $plugin_type, $plugin_css, $lang){
+    public function bookero_products($atts){
+        $atts = array_change_key_case((array)$atts, CASE_LOWER);
+        $params = array();
+        if(isset($atts['product'])){
+            $params['use_product_id'] = 'use_product_id: '.(int) $atts['product'];
+        }
+        if(isset($atts['hide_products'])){
+            $params['hidden_product_ids'] = 'hidden_product_ids: ['.$atts['hide_products'].']';
+        }
+        if(isset($atts['filter_products'])){
+            $params['filter_products_by_id'] = 'filter_products_by_id: ['.$atts['filter_products'].']';
+        }
+
+        $custom_config = '{}';
+        if(!empty($params)){
+            $custom_config = '{'.implode(', ', $params).'}';
+        }
+
+        list($plugin_id, $container, $plugin_type, $plugin_css, $lang) = $this->get_instance_object();
+        $container = $container.'_'.uniqid();
+
+        $html = "<script type=\"text/javascript\">
+if(bookero_config == undefined){
+    var bookero_config = [];
+}
+var bookero_instance_config = {
+    id: '" . $plugin_id . "',
+    container: '" . $container . "',
+    type: 'products',
+    position: '',
+    plugin_css: " . $plugin_css . ",
+    lang: '" . $lang . "',
+    custom_config: ".$custom_config."
+}
+bookero_config.push(bookero_instance_config);
+</script>";
+        if($container){
+            $html .= "<div id=\"".$container."\"></div>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Load Bookero library
+     *
+     * @return string
+     */
+    public function getPlugin(){
         $plugin_html = "<script type=\"text/javascript\">
-			var bookero_config = {
-                    id: '" . $plugin_id . "',
-                    container: '" . $container . "',
-                    type: '" . $plugin_type . "',
-                    position: '',
-                    plugin_css: " . $plugin_css . ",
-                    lang: '" . $lang . "',
-                    custom_config: typeof bookero_custom_config !== 'undefined' ? bookero_custom_config : {}
-               };
-    
-              (function() {
-                var d = document, s = d.createElement('script');
-                s.src = 'https://cdn.bookero.pl/plugin/v2/js/bookero-compiled.js';
-                d.body.appendChild(s);
-              })();
+              if(bookero_config != undefined && bookero_config.length >= 1){  
+                  (function() {
+                    var d = document, s = d.createElement('script');
+                    s.src = 'https://cdn.bookero.pl/plugin/v2/js/bookero-compiled.js';
+                    d.body.appendChild(s);
+                  })();
+              }    
 			</script>";
 
         return $plugin_html;

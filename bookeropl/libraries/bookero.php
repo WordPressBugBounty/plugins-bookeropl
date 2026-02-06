@@ -3,23 +3,21 @@
 class Bookero{
 
     static $api_version = 'v1';
-    static $key;
+    static $transient_key = '__bookero_id_ts';
 
     static function checkApiKey($key){
-        $response = self::Query('check-key', array('key' => $key));
-        if($response !== false && isset($response->result) && $response->result == 1){
-            self::$key = $key;
-            return $response->data->bookero_id;
+        $bookero_id = get_transient(self::$transient_key);
+        if(!$bookero_id){
+            $response = self::Query('check-key', array('key' => $key));
+            if($response !== false && isset($response->result) && $response->result == 1){
+                set_transient(self::$transient_key, $response->data->bookero_id, 7 * 24 * 60 * 60);
+                return $response->data->bookero_id;
+            }
+            return false;
         }
-        return false;
-    }
-
-    static function getInquiries($status, $today = 0){
-        $response = self::Query('inquiries', array('key' => self::$key, 'status' => $status, 'today' => $today));
-        if($response !== false && isset($response->result) && $response->result == 1){
-            return $response->data;
+        else{
+            return $bookero_id;
         }
-        return array();
     }
 
     static function Query($query, $params = array(), $method = 'POST'){

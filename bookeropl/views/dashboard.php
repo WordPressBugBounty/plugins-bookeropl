@@ -10,18 +10,7 @@
     if (!empty($this->options['bookero_api_key']) && Bookero::checkApiKey($this->options['bookero_api_key']) !== false):
     ?>
     <p>
-        <?php
-        $waiting = count(Bookero::getInquiries(1));
-        if($waiting):
-        ?>
-        <span style="color: #ce2720"><strong>Rezerwacje oczekujące na odpowiedź: </strong> <?php echo $waiting; ?></span><br />
-        <?php
-        endif;
-        ?>
-        <strong>Potwierdzone rezerwacje na dzisiaj: </strong> <?php echo count(Bookero::getInquiries(3,1)); ?>
-    </p>
-    <p>
-        Kliknij przycisk poniżej i przejdź do pełnego kalendarza rezerwacji:
+        Twój klucz jest poprawny. Dziękujemy za wybór Bookero.
     </p>
     <?php
     elseif(!empty($this->options['bookero_api_key'])):
