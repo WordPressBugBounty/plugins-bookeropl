@@ -2,12 +2,16 @@
 /*
    Plugin Name: Bookero Plugin
    Plugin URI: http://wordpress.org/extend/plugins/bookero-plugin/
-   Version: 2.1
+   Version: 2.3
    Author: Bookero.pl
    Description: Wtyczka do wordpress, wyświetlająca formularz rezerwacji online Bookero
    Text Domain: bookero-plugin
    License: GPLv2 or later
 */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 include_once('libraries/bookero.php');
 include_once('libraries/bookero-panel.php');
@@ -20,8 +24,8 @@ function getPluginDir() {
 }
 
 if( is_admin() ){
-    if(isset($_POST['bookero_options']['bookero_api_key'])){
-        delete_transient(Bookero::$transient_key);
+    if ( isset( $_POST['bookero_options']['bookero_api_key'] ) ) {
+        delete_transient( Bookero::$transient_key );
     }
     $bookero_panel = new BookeroPanelPage();
 }

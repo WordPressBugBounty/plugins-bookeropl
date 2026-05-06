@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <h1>Bookero - System rezerwacji online</h1>
 <h2 class="nav-tab-wrapper">
     <a class="nav-tab<?php echo (isset($active) && $active == 'dashboard') ? ' nav-tab-active' : ''; ?>" href="?page=bookero-panel">Kalendarz</a>

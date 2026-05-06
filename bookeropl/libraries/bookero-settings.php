@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class BookeroSettingsPage
 {
     /**
@@ -98,8 +102,30 @@ class BookeroSettingsPage
      */
     public function sanitize( $input )
     {
-        $new_input = $input;
-        // TODO weryfikacja inputow
+        $new_input = array();
+
+        if ( ! is_array( $input ) ) {
+            return $new_input;
+        }
+
+        if ( isset( $input['bookero_api_key'] ) ) {
+            $new_input['bookero_api_key'] = sanitize_text_field( (string) $input['bookero_api_key'] );
+        }
+
+        foreach ( array( 'show_plugin', 'plugin_css' ) as $bool_key ) {
+            if ( isset( $input[ $bool_key ] ) ) {
+                $new_input[ $bool_key ] = ( (int) $input[ $bool_key ] === 1 ) ? 1 : 0;
+            }
+        }
+
+        if ( isset( $input['plugin_type'] ) ) {
+            $type = (int) $input['plugin_type'];
+            $new_input['plugin_type'] = in_array( $type, array( 1, 2, 3, 4 ), true ) ? $type : 1;
+        }
+
+        if ( isset( $input['plugin_html_id'] ) ) {
+            $new_input['plugin_html_id'] = sanitize_html_class( (string) $input['plugin_html_id'], 'bookero' );
+        }
 
         return $new_input;
     }

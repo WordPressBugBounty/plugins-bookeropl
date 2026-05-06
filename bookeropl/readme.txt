@@ -1,10 +1,10 @@
 === Bookero.pl - system rezerwacji online ===
-Contributors: Bookero.pl
+Contributors: safistudio
 Tags: rezerwacje, system rezerwacji, formularz rezerwacji, rezerwacje online, system rezerwacji online
 License: GPLv2 or later
 Requires at least: 5.7
-Tested up to: 6.8.3
-Stable tag: 2.1
+Tested up to: 6.9
+Stable tag: 2.3
 
 Wtyczka do wordpress wyświetlająca formularz systemu rezerwacji online Bookero
 
@@ -35,6 +35,16 @@ Zainstaluj wtyczkę, a następnie przejdź do ustawień. Wypełnij pole API Key 
 Po kliknięciu przycisku zapisz formularz powinien pojawić się na stronie.
 
 == Changelog ==
+
+= 2.3 =
+- Poprawka bezpieczeństwa: sanityzacja atrybutów `hide_products` i `filter_products` shortcode'u `[bookero_products]`
+- Sanityzacja opcji wtyczki w panelu admina
+- Escapowanie wartości wstawianych do bloków `<script>` (esc_js / esc_attr)
+- Zabezpieczenie przed bezpośrednim wywołaniem plików PHP (ABSPATH)
+- Zaktualizowana wersja "Tested up to" do 6.9
+
+= 2.2 =
+- Poprawienie warunków wyświetlania formularza
 
 = 2.1 =
 - Poprawienie wyświetlania formularza typu sticky

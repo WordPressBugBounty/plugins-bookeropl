@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class BookeroFrontPage
 {
     /**
@@ -137,23 +141,23 @@ class BookeroFrontPage
         $html = '';
         if($plugin_type != 'sticky' || $force_sticky == true){
             $html = "<script type=\"text/javascript\">
-if(bookero_config == undefined){
+if(typeof bookero_config === 'undefined'){
     var bookero_config = [];
 }
 var bookero_instance_config = {
-    id: '" . $plugin_id . "',
-    container: '" . $container . "',
-    type: '" . $plugin_type . "',
+    id: '" . esc_js($plugin_id) . "',
+    container: '" . esc_js($container) . "',
+    type: '" . esc_js($plugin_type) . "',
     position: '',
     plugin_css: " . $plugin_css . ",
-    lang: '" . $lang . "',
+    lang: '" . esc_js($lang) . "',
     custom_config: ".$custom_config."
 };
 bookero_config.push(bookero_instance_config);
 </script>";
         }
         if($container){
-            $html .= "<div id=\"".$container."\"></div>";
+            $html .= "<div id=\"".esc_attr($container)."\"></div>";
         }
 
         return $html;
@@ -171,10 +175,16 @@ bookero_config.push(bookero_instance_config);
             $params['use_product_id'] = 'use_product_id: '.(int) $atts['product'];
         }
         if(isset($atts['hide_products'])){
-            $params['hidden_product_ids'] = 'hidden_product_ids: ['.$atts['hide_products'].']';
+            $hide_ids = $this->sanitize_id_list($atts['hide_products']);
+            if($hide_ids !== ''){
+                $params['hidden_product_ids'] = 'hidden_product_ids: ['.$hide_ids.']';
+            }
         }
         if(isset($atts['filter_products'])){
-            $params['filter_products_by_id'] = 'filter_products_by_id: ['.$atts['filter_products'].']';
+            $filter_ids = $this->sanitize_id_list($atts['filter_products']);
+            if($filter_ids !== ''){
+                $params['filter_products_by_id'] = 'filter_products_by_id: ['.$filter_ids.']';
+            }
         }
 
         $custom_config = '{}';
@@ -186,25 +196,46 @@ bookero_config.push(bookero_instance_config);
         $container = $container.'_'.uniqid();
 
         $html = "<script type=\"text/javascript\">
-if(bookero_config == undefined){
+if(typeof bookero_config === 'undefined'){
     var bookero_config = [];
 }
 var bookero_instance_config = {
-    id: '" . $plugin_id . "',
-    container: '" . $container . "',
+    id: '" . esc_js($plugin_id) . "',
+    container: '" . esc_js($container) . "',
     type: 'products',
     position: '',
     plugin_css: " . $plugin_css . ",
-    lang: '" . $lang . "',
+    lang: '" . esc_js($lang) . "',
     custom_config: ".$custom_config."
 }
 bookero_config.push(bookero_instance_config);
 </script>";
         if($container){
-            $html .= "<div id=\"".$container."\"></div>";
+            $html .= "<div id=\"".esc_attr($container)."\"></div>";
         }
 
         return $html;
+    }
+
+    /**
+     * Sanitize comma-separated list of integer IDs.
+     *
+     * @return string
+     */
+    private function sanitize_id_list($value){
+        if(!is_scalar($value)){
+            return '';
+        }
+        $parts = explode(',', (string) $value);
+        $ids = array();
+        foreach($parts as $part){
+            $part = trim($part);
+            if($part === '' || !ctype_digit($part)){
+                continue;
+            }
+            $ids[] = (int) $part;
+        }
+        return implode(',', $ids);
     }
 
     /**
@@ -214,7 +245,7 @@ bookero_config.push(bookero_instance_config);
      */
     public function getPlugin(){
         $plugin_html = "<script type=\"text/javascript\">
-              if(bookero_config != undefined && bookero_config.length >= 1){  
+              if(typeof bookero_config !== 'undefined' && bookero_config.length >= 1){  
                   (function() {
                     var d = document, s = d.createElement('script');
                     s.src = 'https://cdn.bookero.pl/plugin/v2/js/bookero-compiled.js';
